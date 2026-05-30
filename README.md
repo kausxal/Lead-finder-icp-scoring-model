@@ -1,5 +1,7 @@
 # Terrascope ICP Lead Finder
 
+![Terrascope ICP Lead Finder](screenshots/app_screenshot.png)
+
 A desktop application that scores over 15,000 companies from the SBTi database against Terrascope's Ideal Customer Profile, enriches them with real-world data from multiple sources, and provides a complete workflow for filtering, evaluating, and exporting leads.
 
 ---
