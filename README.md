@@ -38,16 +38,14 @@ flowchart TB
     end
 
     subgraph "Scoring Engine"
-        E --> R[Company Size: 0-15]
-        E --> S[Industry Fit: 5-20]
-        E --> T[Agriculture Bonus: 0-5]
-        E --> U[Regulatory Pressure: 0-15]
-        E --> V[SBTi Commitment: 0-25]
-        R --> W[Total Score: 0-80]
+        E --> R[Industry Fit: 5-20]
+        E --> S[Agriculture Bonus: 0-5]
+        E --> T[Regulatory Urgency: 0-40]
+        E --> U[SBTi Commitment: 0-25]
+        R --> W[Total Score: 0-90]
         S --> W
         T --> W
         U --> W
-        V --> W
     end
 
     subgraph "Interface"
@@ -91,43 +89,58 @@ The first run will prompt you to download the SBTi database. After the download 
 
 ## The Scoring Model
 
-The ICP score is designed to reflect genuine fit rather than inflated metrics. Every point must be earned through measurable characteristics.
+The ICP score measures genuine fit. Every point must be earned through real, verifiable signals.
 
-### What changed from the original model
+### Score Components (Max 90)
 
-The original scoring had two problems. First, every company that was not in an excluded industry received 20 free points for passing a check that required no effort. Second, SBTi commitment was counted twice -- once in the regulatory category and once as its own category. This inflated scores artificially and made it hard to distinguish strong leads from weak ones.
+| Component | Max | What It Measures |
+|-----------|-----|------------------|
+| Industry Fit | 20 | High-fit industries (food, agriculture, retail, manufacturing, logistics, consumer goods, fashion, packaging, food and beverage) score 20. Medium-fit (real estate, healthcare, technology, energy, utilities, chemicals) score 12. All others score 5. |
+| Agriculture Bonus | 5 | Additional 5 points on top of industry fit if the company operates in agriculture or farming. |
+| Regulatory Urgency | 40 | Scaled by deadline proximity of the most urgent applicable regulation. Urgency 10 (<90 days) = 40pts, 8 (90-180d) = 32pts, 6 (180-365d) = 24pts, 4 (365-730d) = 16pts, 2 (>730d) = 8pts, 0 (no mandate) = 0pts. |
+| SBTi Commitment | 25 | Net Zero Achieved = 25. Targets Set = 20. Committed = 15. No commitment = 0. |
 
-The current model removed those free points entirely. The maximum possible score is 80, and every point must come from a real signal.
+### Regulations Tracked
 
-### Score Components
+| Market | Regulation | Deadline (May 2026) | Points if Applicable |
+|--------|-----------|-------------------|---------------------|
+| United States | California SB253 | August 10, 2026 (72 days) | 40 |
+| Australia | AASB S2 | Today (active) | 40 |
+| European Union | CSRD + CBAM | Active | 40 |
+| Singapore | SGX TCFD / IFRS S2 | January 1, 2027 | 24 |
+| Japan | SSBJ | March 31, 2027 | 24 |
+| South Korea | ESG Disclosure | January 1, 2028 | 16 |
 
-| Component | Maximum | What It Measures |
-|-----------|---------|------------------|
-| Company Size | 15 | Established companies with 200 or more employees score the full amount. Smaller companies score zero. This is a binary check, not a sliding scale, because the question is whether the company has enough organizational scale to purchase your solution. |
-| Industry Fit | 20 | Companies in high-fit industries (food, agriculture, retail, manufacturing, logistics, consumer goods, fashion, packaging, food and beverage) score 20. Medium-fit industries (real estate, healthcare, technology, energy, utilities, chemicals) score 12. All others score 5. |
-| Agriculture Bonus | 5 | Companies specifically in agriculture or farming receive an additional 5 points. This reflects a strategic priority on the agricultural supply chain. |
-| Regulatory Pressure | 15 | Companies headquartered in EU countries score 15. Regulatory mandates like CSRD create a compliance-driven need that makes these companies more likely to act. |
-| SBTi Commitment | 25 | This is the strongest signal. Companies that have achieved net zero score 25. Those with targets set score 20. Committed companies score 15. Companies without any SBTi commitment score zero. |
-| Exclusion Check | -- | Companies in excluded industries (financial services, government, professional services, oil and gas, banking, insurance, consulting) automatically score zero regardless of all other factors. This is a gate, not a scoring category. |
+When a company faces multiple regulations, only the highest urgency score is used.
 
 ### Score Tiers
 
-The overall score determines the lead status, which is shown in the table and the detail panel.
+The overall score determines the lead status, shown in the table and detail panel.
 
-- **HOT (55 and above):** These companies check multiple boxes. They have scale, are in the right industry, face regulatory pressure, and have demonstrated climate commitment. These are the highest-priority leads.
-- **WARM (30 to 54):** These companies show some fit but are missing one or more key signals. They may not be in a high-fit industry, or they may lack regulatory pressure or SBTi commitment. Worth pursuing but not urgent.
-- **COLD (below 30):** These companies lack most of the signals the ICP looks for. They may be small, in a low-fit industry, outside regulatory reach, and uncommitted to climate targets.
+- **HOT (63 and above):** These companies face an approaching regulatory deadline and are in the right industry. Highest priority.
+- **WARM (36 to 62):** These companies show some fit but lack regulatory urgency, industry alignment, or SBTi commitment. Worth pursuing.
+- **COLD (below 36):** These companies lack most ICP signals. Not a current priority.
 
 ### Score Display
 
 When you click any company in the results table, the right panel shows a breakdown of exactly where the score came from. Each component is listed with its contribution:
 
-  Company Size      15/15  Established company
-  Industry Fit      20/20  High fit
-  Regulatory Press. 15/15  CSRD applicable
-  SBTi Commitment   20/25  Targets set
+  Industry Fit        20/20  High fit
+  Agriculture Bonus    5/5   Agriculture/Farming
+  Regulatory Urgency  40/40  California SB253 (72d remaining)
+  SBTi Commitment     20/25  Targets set
 
-The score number is color-coded: green when the component is performing well, amber when it is middling, and red when it is contributing little or nothing. This makes it easy to see at a glance which factors are driving the score and which ones are missing.
+The score number is color-coded green when the component is performing well, amber when middling, and red when contributing little.
+
+### What Was Removed
+
+The original scoring model had three problems that artificially inflated scores. The current model removes all of them:
+
+- **Company Size (was 15pts):** Employee data was only available for 2% of companies. This category was dead weight -- 98% of companies scored zero by default, making it useless for differentiation. Removed entirely.
+- **ICP Exclusion Check (was 20 free points):** Every company not in an excluded industry received 20 points for passing a check that required no effort. This inflated every score by a fixed amount and made it harder to distinguish strong leads from weak ones. Removed entirely. Exclusions are still available as a UI filter.
+- **SBTi Double-Counting:** SBTi commitment was counted twice -- once in the Regulatory Pressure category (companies with SBTi commitment were assumed to face regulatory pressure) and once in its own SBTi category. This inflated scores for companies with SBTi commitment and made the regulatory signal unreliable. Removed. Regulatory urgency is now entirely deadline-driven.
+
+The maximum possible score is 90 instead of 80. This does not mean scores went up -- the regulatory urgency component pays out 40 points only for companies with near-term deadlines, whereas the old system gave 15 points to everyone in the EU regardless of deadline proximity.
 
 ---
 
@@ -276,6 +289,7 @@ terrascope_lead_finder/
   data_handler.py            SBTi download, cache management, My List, website validation
   filters.py                 Filter pipeline and score computation
   scoring.py                 ICP scoring algorithm, color functions, country lists
+  regulatory_urgency.py      Regulation database, deadline mapping, urgency calculation
   exporter.py                CSV, Google Sheets CSV, and styled Excel export
   enrichment.py              OSI and Origin/SEC API enrichment clients
   clearbit_enricher.py       Clearbit Autocomplete batch with checkpoint resume
@@ -317,4 +331,4 @@ terrascope_lead_finder/
 | DANGER | `#ff4757` | Destructive actions, cold lead status |
 | WARNING | `#ffa502` | Warning state, warm lead status |
 
-Score colors follow the same pattern: 55 and above uses the accent green, 30 to 54 uses amber, and below 30 uses red.
+Score colors follow the same pattern: 63 and above uses the accent green, 36 to 62 uses amber, and below 36 uses red.

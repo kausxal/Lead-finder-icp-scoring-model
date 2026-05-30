@@ -27,25 +27,6 @@ def calculate_icp_score(company):
     score = 0
     breakdown = {}
 
-    employees = company.get("employees", 0) or 0
-    if isinstance(employees, str):
-        try:
-            employees = int(float(employees.replace(",", "")))
-        except:
-            employees = 0
-
-    origin_emp = company.get("origin_employees")
-    if origin_emp and isinstance(origin_emp, (int, float)) and origin_emp > employees:
-        employees = int(origin_emp)
-
-    # Company Size: 15 if >=200, 0 otherwise
-    if employees >= 200:
-        score += 15
-        breakdown["Company Size"] = "15/15 - Established company"
-    else:
-        breakdown["Company Size"] = "0/15 - Small company"
-
-    # Industry Fit: High=20, Medium=12, Low=5
     industry_lower = str(company.get("industry", "") or "").lower()
     sector_raw = str(company.get("sector_raw", "") or "").lower()
     combined = industry_lower + " " + sector_raw
@@ -62,20 +43,21 @@ def calculate_icp_score(company):
         breakdown["Industry Fit"] = "5/20 - Low fit"
     score += industry_score
 
-    # Agriculture Bonus: +5 if company is agriculture/farming
     if any(ind in combined for ind in ["agriculture", "farming"]):
         score += 5
         breakdown["Agriculture Focus"] = "5/5 - Agriculture/Farming"
 
-    # Regulatory Pressure: CSRD only (15), no SBTi overlap
     country = str(company.get("country", "") or "").lower()
-    if any(eu in country for eu in EU_COUNTRIES):
-        score += 15
-        breakdown["Regulatory Pressure"] = "15/15 - CSRD applicable"
+    from regulatory_urgency import get_regulatory_urgency
+    urg, label, desc = get_regulatory_urgency(country)
+    urg_pts = urg * 4
+    if urg_pts:
+        desc_part = f"  ({desc})" if desc else ""
+        breakdown["Regulatory Urgency"] = f"{urg_pts}/40 - {label}{desc_part}"
     else:
-        breakdown["Regulatory Pressure"] = "0/15 - No CSRD mandate"
+        breakdown["Regulatory Urgency"] = "0/40 - No mandate"
+    score += urg_pts
 
-    # SBTi Commitment: Consolidated here (max 25)
     sbti_status = str(company.get("sbti_status", "") or "").lower()
     sbti_score = 0
     if "achieved" in sbti_status:
@@ -91,33 +73,28 @@ def calculate_icp_score(company):
         breakdown["SBTi Commitment"] = "0/25 - No commitment"
     score += sbti_score
 
-    # ICP Exclusion: Gate only, no points. Entire score zeroed if excluded.
-    if any(exc in combined for exc in EXCLUDED_INDUSTRIES):
-        score = 0
-        breakdown["Excluded Industry"] = "0/0 - EXCLUDED"
-
-    return min(score, 80), breakdown
+    return min(score, 90), breakdown
 
 
 def lead_status(score):
-    if score >= 55:
+    if score >= 63:
         return "HOT"
-    elif score >= 30:
+    elif score >= 36:
         return "WARM"
     return "COLD"
 
 
 def score_color(score):
-    if score >= 70:
+    if score >= 63:
         return "#00d4aa"
-    elif score >= 40:
+    elif score >= 36:
         return "#ffa502"
     return "#ff4757"
 
 
 def score_bg(score):
-    if score >= 70:
+    if score >= 63:
         return "#0a2e22"
-    elif score >= 40:
+    elif score >= 36:
         return "#2a1f0a"
     return "#2a0a0f"

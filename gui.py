@@ -112,7 +112,7 @@ class CircularProgress(ctk.CTkCanvas):
     def __init__(self, master, size=120, **kwargs):
         super().__init__(master, width=size, height=size, highlightthickness=0, bg=BG, **kwargs)
         self.size = size
-        self.MAX = 80
+        self.MAX = 90
         self.value = 0
         self.draw(0)
 
@@ -1663,7 +1663,7 @@ class TerrascopeApp(ctk.CTk):
         circ = CircularProgress(gf, size=120)
         circ.pack()
         circ.draw(score)
-        ctk.CTkLabel(c, text=f"ICP Score: {score}/80", font=(FONT_FAMILY, 13, "bold"),
+        ctk.CTkLabel(c, text=f"ICP Score: {score}/90", font=(FONT_FAMILY, 13, "bold"),
                      text_color=score_color(score)).pack(anchor="center", pady=(2, 8))
 
         ctk.CTkFrame(c, fg_color="#2a2f3e", height=1).pack(fill="x", pady=4)
