@@ -134,15 +134,6 @@ When you click any company in the results table, the right panel shows a breakdo
 
 The score number is color-coded green when the component is performing well, amber when middling, and red when contributing little.
 
-### What Was Removed
-
-The original scoring model had three problems that artificially inflated scores. The current model removes all of them:
-
-- **Company Size (was 15pts):** Employee data was only available for 2% of companies. This category was dead weight -- 98% of companies scored zero by default, making it useless for differentiation. Removed entirely.
-- **ICP Exclusion Check (was 20 free points):** Every company not in an excluded industry received 20 points for passing a check that required no effort. This inflated every score by a fixed amount and made it harder to distinguish strong leads from weak ones. Removed entirely. Exclusions are still available as a UI filter.
-- **SBTi Double-Counting:** SBTi commitment was counted twice -- once in the Regulatory Pressure category (companies with SBTi commitment were assumed to face regulatory pressure) and once in its own SBTi category. This inflated scores for companies with SBTi commitment and made the regulatory signal unreliable. Removed. Regulatory urgency is now entirely deadline-driven.
-
-The maximum possible score is 90 instead of 80. This does not mean scores went up -- the regulatory urgency component pays out 40 points only for companies with near-term deadlines, whereas the old system gave 15 points to everyone in the EU regardless of deadline proximity.
 
 ---
 
