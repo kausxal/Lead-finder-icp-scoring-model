@@ -1012,8 +1012,11 @@ class TerrascopeApp(ctk.CTk):
     # ======================= FILTERS =======================
 
     def _start_filter_polling(self):
-        self._last_filter_values = {}
-        self._poll_filters()
+        self.after(100, self._prime_poll)
+
+    def _prime_poll(self):
+        self._last_filter_values = {k: e.get() for k, e in self._filter_entries.items()}
+        self.after(200, self._poll_filters)
 
     def _poll_filters(self):
         if self.df is None:
