@@ -1033,6 +1033,7 @@ class TerrascopeApp(ctk.CTk):
             return
 
         if getattr(self, '_filter_running', False):
+            self._filter_pending = True
             return
 
         def _int_or_none(v):
@@ -1066,9 +1067,12 @@ class TerrascopeApp(ctk.CTk):
             self.find_btn.configure(state="normal", text="\U0001f50d  Find Companies")
             return
 
+        self._last_filter_hash = fhash
+        self._last_filter_dfv = dv
         self.find_btn.configure(state="disabled", text="\u23f3  Searching...")
         self.status_bar.set_status("Computing scores...")
         self._filter_running = True
+        self._filter_pending = False
 
         def run():
             try:
@@ -1085,20 +1089,26 @@ class TerrascopeApp(ctk.CTk):
                     if c != "All":
                         result = result[result["sbti_status"].str.lower().str.contains(c.lower(), na=False)]
 
-                self._last_filter_hash = fhash
-                self._last_filter_dfv = dv + 1
                 self.after(0, lambda d=df, r=result: self._on_scores_ready(d, r))
             except Exception as e:
                 self.after(0, lambda: self.status_bar.set_status("Computation failed"))
                 self.after(0, lambda: messagebox.showerror("Error", str(e)))
                 self.after(0, lambda: self.find_btn.configure(state="normal", text="\U0001f50d  Find Companies"))
             finally:
-                self.after(0, lambda: setattr(self, '_filter_running', False))
+                self.after(0, self._on_filter_done)
         threading.Thread(target=run, daemon=True).start()
+
+    def _on_filter_done(self):
+        self._filter_running = False
+        self.find_btn.configure(state="normal", text="\U0001f50d  Find Companies")
+        if getattr(self, '_filter_pending', False):
+            self._filter_pending = False
+            self._schedule_refilter()
 
     def _on_scores_ready(self, df, result):
         self.df = df
         self._df_version += 1
+        self._last_filter_dfv = self._df_version
         self.status_bar.set_status("Saving...")
         save_cached_data(self.df)
         self._on_filters_applied(result)
