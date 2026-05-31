@@ -372,17 +372,21 @@ class TerrascopeApp(ctk.CTk):
         ctk.CTkLabel(empf, text="From", font=(FONT_FAMILY, 10), text_color=TEXT_SECONDARY).grid(row=0, column=0, sticky="w", padx=(0, 2))
         self.emp_min_var = ctk.StringVar()
         self.emp_min_var.trace_add("write", self._schedule_refilter)
-        ctk.CTkEntry(empf, textvariable=self.emp_min_var, placeholder_text="0",
+        e1 = ctk.CTkEntry(empf, textvariable=self.emp_min_var, placeholder_text="0",
                      fg_color=CARD_LIGHT, text_color=TEXT, font=(FONT_FAMILY, 11),
                      border_width=0, corner_radius=6, height=30,
-                     ).grid(row=0, column=1, sticky="ew", padx=(0, 4))
+                     )
+        e1.grid(row=0, column=1, sticky="ew", padx=(0, 4))
+        e1.bind("<KeyRelease>", self._schedule_refilter)
         ctk.CTkLabel(empf, text="To", font=(FONT_FAMILY, 10), text_color=TEXT_SECONDARY).grid(row=0, column=2, sticky="w", padx=(0, 2))
         self.emp_max_var = ctk.StringVar()
         self.emp_max_var.trace_add("write", self._schedule_refilter)
-        ctk.CTkEntry(empf, textvariable=self.emp_max_var, placeholder_text="any",
+        e2 = ctk.CTkEntry(empf, textvariable=self.emp_max_var, placeholder_text="any",
                      fg_color=CARD_LIGHT, text_color=TEXT, font=(FONT_FAMILY, 11),
                      border_width=0, corner_radius=6, height=30,
-                     ).grid(row=0, column=3, sticky="ew")
+                     )
+        e2.grid(row=0, column=3, sticky="ew")
+        e2.bind("<KeyRelease>", self._schedule_refilter)
         r += 1
 
         self.region_group = FilterDropdown(fc, "REGIONS", ALL_REGIONS, on_change=self._schedule_refilter)
@@ -434,17 +438,21 @@ class TerrascopeApp(ctk.CTk):
         ctk.CTkLabel(tyf, text="From", font=(FONT_FAMILY, 10), text_color=TEXT_SECONDARY).grid(row=0, column=0, sticky="w", padx=(0, 2))
         self.target_year_min_var = ctk.StringVar()
         self.target_year_min_var.trace_add("write", self._schedule_refilter)
-        ctk.CTkEntry(tyf, textvariable=self.target_year_min_var, placeholder_text="2025",
+        e1 = ctk.CTkEntry(tyf, textvariable=self.target_year_min_var, placeholder_text="2025",
                      fg_color=CARD_LIGHT, text_color=TEXT, font=(FONT_FAMILY, 11),
                      border_width=0, corner_radius=6, height=30,
-                     ).grid(row=0, column=1, sticky="ew", padx=(0, 4))
+                     )
+        e1.grid(row=0, column=1, sticky="ew", padx=(0, 4))
+        e1.bind("<KeyRelease>", self._schedule_refilter)
         ctk.CTkLabel(tyf, text="To", font=(FONT_FAMILY, 10), text_color=TEXT_SECONDARY).grid(row=0, column=2, sticky="w", padx=(0, 2))
         self.target_year_max_var = ctk.StringVar()
         self.target_year_max_var.trace_add("write", self._schedule_refilter)
-        ctk.CTkEntry(tyf, textvariable=self.target_year_max_var, placeholder_text="2030",
+        e2 = ctk.CTkEntry(tyf, textvariable=self.target_year_max_var, placeholder_text="2030",
                      fg_color=CARD_LIGHT, text_color=TEXT, font=(FONT_FAMILY, 11),
                      border_width=0, corner_radius=6, height=30,
-                     ).grid(row=0, column=3, sticky="ew")
+                     )
+        e2.grid(row=0, column=3, sticky="ew")
+        e2.bind("<KeyRelease>", self._schedule_refilter)
         r += 1
 
         # ICP Score range
@@ -457,17 +465,21 @@ class TerrascopeApp(ctk.CTk):
         ctk.CTkLabel(icpf, text="Min", font=(FONT_FAMILY, 10), text_color=TEXT_SECONDARY).grid(row=0, column=0, sticky="w", padx=(0, 2))
         self.icp_score_min_var = ctk.StringVar()
         self.icp_score_min_var.trace_add("write", self._schedule_refilter)
-        ctk.CTkEntry(icpf, textvariable=self.icp_score_min_var, placeholder_text="0",
+        e1 = ctk.CTkEntry(icpf, textvariable=self.icp_score_min_var, placeholder_text="0",
                      fg_color=CARD_LIGHT, text_color=TEXT, font=(FONT_FAMILY, 11),
                      border_width=0, corner_radius=6, height=30,
-                     ).grid(row=0, column=1, sticky="ew", padx=(0, 4))
+                     )
+        e1.grid(row=0, column=1, sticky="ew", padx=(0, 4))
+        e1.bind("<KeyRelease>", self._schedule_refilter)
         ctk.CTkLabel(icpf, text="Max", font=(FONT_FAMILY, 10), text_color=TEXT_SECONDARY).grid(row=0, column=2, sticky="w", padx=(0, 2))
         self.icp_score_max_var = ctk.StringVar()
         self.icp_score_max_var.trace_add("write", self._schedule_refilter)
-        ctk.CTkEntry(icpf, textvariable=self.icp_score_max_var, placeholder_text="100",
+        e2 = ctk.CTkEntry(icpf, textvariable=self.icp_score_max_var, placeholder_text="100",
                      fg_color=CARD_LIGHT, text_color=TEXT, font=(FONT_FAMILY, 11),
                      border_width=0, corner_radius=6, height=30,
-                     ).grid(row=0, column=3, sticky="ew")
+                     )
+        e2.grid(row=0, column=3, sticky="ew")
+        e2.bind("<KeyRelease>", self._schedule_refilter)
         r += 1
 
         self.lead_status_group = FilterDropdown(fc, "LEAD STATUS", LEAD_STATUS_OPTIONS, on_change=self._schedule_refilter)
@@ -484,17 +496,21 @@ class TerrascopeApp(ctk.CTk):
         ctk.CTkLabel(lff, text="From", font=(FONT_FAMILY, 10), text_color=TEXT_SECONDARY).grid(row=0, column=0, sticky="w", padx=(0, 2))
         self.fetch_from_var = ctk.StringVar()
         self.fetch_from_var.trace_add("write", self._schedule_refilter)
-        ctk.CTkEntry(lff, textvariable=self.fetch_from_var, placeholder_text="2026-01-01",
+        e1 = ctk.CTkEntry(lff, textvariable=self.fetch_from_var, placeholder_text="2026-01-01",
                      fg_color=CARD_LIGHT, text_color=TEXT, font=(FONT_FAMILY, 11),
                      border_width=0, corner_radius=6, height=30,
-                     ).grid(row=0, column=1, sticky="ew", padx=(0, 4))
+                     )
+        e1.grid(row=0, column=1, sticky="ew", padx=(0, 4))
+        e1.bind("<KeyRelease>", self._schedule_refilter)
         ctk.CTkLabel(lff, text="To", font=(FONT_FAMILY, 10), text_color=TEXT_SECONDARY).grid(row=0, column=2, sticky="w", padx=(0, 2))
         self.fetch_to_var = ctk.StringVar()
         self.fetch_to_var.trace_add("write", self._schedule_refilter)
-        ctk.CTkEntry(lff, textvariable=self.fetch_to_var, placeholder_text="2026-12-31",
+        e2 = ctk.CTkEntry(lff, textvariable=self.fetch_to_var, placeholder_text="2026-12-31",
                      fg_color=CARD_LIGHT, text_color=TEXT, font=(FONT_FAMILY, 11),
                      border_width=0, corner_radius=6, height=30,
-                     ).grid(row=0, column=3, sticky="ew")
+                     )
+        e2.grid(row=0, column=3, sticky="ew")
+        e2.bind("<KeyRelease>", self._schedule_refilter)
         r += 1
 
         # Find button
@@ -1076,11 +1092,11 @@ class TerrascopeApp(ctk.CTk):
 
         def run():
             try:
-                df = self.df.copy()
-                for col in ["icp_score", "score_breakdown", "lead_status"]:
-                    if col in df.columns:
-                        df = df.drop(columns=[col])
-                df = compute_scores(df)
+                if "icp_score" not in self.df.columns:
+                    df = compute_scores(self.df)
+                    self.after(0, lambda d=df: self._on_scores_ready(d))
+                else:
+                    df = self.df
 
                 f_dict = {k: list(v) if isinstance(v, tuple) else v for k, v in filters.items()}
                 result = apply_filters(df, f_dict)
@@ -1089,7 +1105,7 @@ class TerrascopeApp(ctk.CTk):
                     if c != "All":
                         result = result[result["sbti_status"].str.lower().str.contains(c.lower(), na=False)]
 
-                self.after(0, lambda d=df, r=result: self._on_scores_ready(d, r))
+                self.after(0, lambda r=result: self._on_filters_applied(r))
             except Exception as e:
                 self.after(0, lambda: self.status_bar.set_status("Computation failed"))
                 self.after(0, lambda: messagebox.showerror("Error", str(e)))
@@ -1103,16 +1119,13 @@ class TerrascopeApp(ctk.CTk):
         self.find_btn.configure(state="normal", text="\U0001f50d  Find Companies")
         if getattr(self, '_filter_pending', False):
             self._filter_pending = False
-            self._schedule_refilter()
+            self._on_find_companies()
 
-    def _on_scores_ready(self, df, result):
+    def _on_scores_ready(self, df):
         self.df = df
         self._df_version += 1
         self._last_filter_dfv = self._df_version
-        self.status_bar.set_status("Saving...")
-        save_cached_data(self.df)
-        self._on_filters_applied(result)
-        self.find_btn.configure(state="normal", text="\U0001f50d  Find Companies")
+        threading.Thread(target=save_cached_data, args=(self.df,), daemon=True).start()
 
     def _on_filters_applied(self, result):
         if result is None or result.empty:
@@ -2013,13 +2026,21 @@ class TerrascopeApp(ctk.CTk):
             return
         records = self.filtered_df.to_dict("records")
         def run():
+            my_list = load_my_list()
+            existing_names = {str(item.get("company", "")).lower().strip() for item in my_list}
             added = 0
             for rec in records:
-                before = len(load_my_list())
-                save_to_my_list(rec)
-                if len(load_my_list()) > before:
+                name = str(rec.get("company", "")).lower().strip()
+                if name not in existing_names:
+                    clean = {k: (None if pd.isna(v) else v) for k, v in rec.items()}
+                    clean = {k: (int(v) if isinstance(v, (int, float)) and not pd.isna(v) else v)
+                             for k, v in clean.items()}
+                    my_list.append(clean)
+                    existing_names.add(name)
                     added += 1
-            self.my_list_count = len(load_my_list())
+            with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "my_list.json"), "w", encoding="utf-8") as f:
+                json.dump(my_list, f, indent=2, default=str)
+            self.my_list_count = len(my_list)
             self.after(0, lambda: self.my_list_btn.configure(text=f"\u2b50 My List ({self.my_list_count})"))
             self.after(0, lambda: self.status_bar.set_status(f"Added {added} companies to My List"))
             self.after(0, lambda: messagebox.showinfo("Bulk Add", f"Added {added} new companies to My List (skipped {len(records) - added} duplicates)."))
