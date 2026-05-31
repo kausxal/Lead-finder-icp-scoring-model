@@ -285,8 +285,7 @@ class TerrascopeApp(ctk.CTk):
         self._build_layout()
         self.clay_url_entry.insert(0, _load_config().get("webhook_url", ""))
         self._check_cache_on_startup()
-
-    # ======================= LAYOUT =======================
+        self._start_filter_polling()
 
     def _build_layout(self):
         self.grid_rowconfigure(0, weight=1)
@@ -1018,6 +1017,29 @@ class TerrascopeApp(ctk.CTk):
         threading.Thread(target=run, daemon=True).start()
 
     # ======================= FILTERS =======================
+
+    def _start_filter_polling(self):
+        self._last_filter_values = {}
+        self._poll_filters()
+
+    def _poll_filters(self):
+        if self.df is None:
+            self.after(500, self._poll_filters)
+            return
+        current = {
+            "emp_min": self.emp_min_var.get(),
+            "emp_max": self.emp_max_var.get(),
+            "target_year_min": self.target_year_min_var.get(),
+            "target_year_max": self.target_year_max_var.get(),
+            "icp_score_min": self.icp_score_min_var.get(),
+            "icp_score_max": self.icp_score_max_var.get(),
+            "fetch_from": self.fetch_from_var.get(),
+            "fetch_to": self.fetch_to_var.get(),
+        }
+        if current != self._last_filter_values:
+            self._last_filter_values = current
+            self._schedule_refilter()
+        self.after(200, self._poll_filters)
 
     def _schedule_refilter(self, *args):
         if hasattr(self, '_refilter_timer') and self._refilter_timer:
