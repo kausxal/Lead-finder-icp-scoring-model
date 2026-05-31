@@ -281,6 +281,7 @@ class TerrascopeApp(ctk.CTk):
         self.notes_text = ""
         self.enrichment_results = {}
         self._search_timer = None
+        self._filter_entries = {}
 
         self._build_layout()
         self.clay_url_entry.insert(0, _load_config().get("webhook_url", ""))
@@ -370,22 +371,20 @@ class TerrascopeApp(ctk.CTk):
         empf.grid_columnconfigure((0, 1, 2), weight=1)
         ctk.CTkLabel(empf, text="From", font=(FONT_FAMILY, 10), text_color=TEXT_SECONDARY).grid(row=0, column=0, sticky="w", padx=(0, 2))
         self.emp_min_var = ctk.StringVar()
-        self.emp_min_var.trace_add("write", self._schedule_refilter)
         e1 = ctk.CTkEntry(empf, textvariable=self.emp_min_var, placeholder_text="0",
                      fg_color=CARD_LIGHT, text_color=TEXT, font=(FONT_FAMILY, 11),
                      border_width=0, corner_radius=6, height=30,
                      )
         e1.grid(row=0, column=1, sticky="ew", padx=(0, 4))
-        e1.bind("<KeyRelease>", self._schedule_refilter)
+        self._filter_entries["emp_min"] = e1
         ctk.CTkLabel(empf, text="To", font=(FONT_FAMILY, 10), text_color=TEXT_SECONDARY).grid(row=0, column=2, sticky="w", padx=(0, 2))
         self.emp_max_var = ctk.StringVar()
-        self.emp_max_var.trace_add("write", self._schedule_refilter)
         e2 = ctk.CTkEntry(empf, textvariable=self.emp_max_var, placeholder_text="any",
                      fg_color=CARD_LIGHT, text_color=TEXT, font=(FONT_FAMILY, 11),
                      border_width=0, corner_radius=6, height=30,
                      )
         e2.grid(row=0, column=3, sticky="ew")
-        e2.bind("<KeyRelease>", self._schedule_refilter)
+        self._filter_entries["emp_max"] = e2
         r += 1
 
         self.region_group = FilterDropdown(fc, "REGIONS", ALL_REGIONS, on_change=self._schedule_refilter)
@@ -436,22 +435,20 @@ class TerrascopeApp(ctk.CTk):
         tyf.grid_columnconfigure((0, 1, 2), weight=1)
         ctk.CTkLabel(tyf, text="From", font=(FONT_FAMILY, 10), text_color=TEXT_SECONDARY).grid(row=0, column=0, sticky="w", padx=(0, 2))
         self.target_year_min_var = ctk.StringVar()
-        self.target_year_min_var.trace_add("write", self._schedule_refilter)
         e1 = ctk.CTkEntry(tyf, textvariable=self.target_year_min_var, placeholder_text="2025",
                      fg_color=CARD_LIGHT, text_color=TEXT, font=(FONT_FAMILY, 11),
                      border_width=0, corner_radius=6, height=30,
                      )
         e1.grid(row=0, column=1, sticky="ew", padx=(0, 4))
-        e1.bind("<KeyRelease>", self._schedule_refilter)
+        self._filter_entries["target_year_min"] = e1
         ctk.CTkLabel(tyf, text="To", font=(FONT_FAMILY, 10), text_color=TEXT_SECONDARY).grid(row=0, column=2, sticky="w", padx=(0, 2))
         self.target_year_max_var = ctk.StringVar()
-        self.target_year_max_var.trace_add("write", self._schedule_refilter)
         e2 = ctk.CTkEntry(tyf, textvariable=self.target_year_max_var, placeholder_text="2030",
                      fg_color=CARD_LIGHT, text_color=TEXT, font=(FONT_FAMILY, 11),
                      border_width=0, corner_radius=6, height=30,
                      )
         e2.grid(row=0, column=3, sticky="ew")
-        e2.bind("<KeyRelease>", self._schedule_refilter)
+        self._filter_entries["target_year_max"] = e2
         r += 1
 
         # ICP Score range
@@ -463,22 +460,20 @@ class TerrascopeApp(ctk.CTk):
         icpf.grid_columnconfigure((0, 1, 2), weight=1)
         ctk.CTkLabel(icpf, text="Min", font=(FONT_FAMILY, 10), text_color=TEXT_SECONDARY).grid(row=0, column=0, sticky="w", padx=(0, 2))
         self.icp_score_min_var = ctk.StringVar()
-        self.icp_score_min_var.trace_add("write", self._schedule_refilter)
         e1 = ctk.CTkEntry(icpf, textvariable=self.icp_score_min_var, placeholder_text="0",
                      fg_color=CARD_LIGHT, text_color=TEXT, font=(FONT_FAMILY, 11),
                      border_width=0, corner_radius=6, height=30,
                      )
         e1.grid(row=0, column=1, sticky="ew", padx=(0, 4))
-        e1.bind("<KeyRelease>", self._schedule_refilter)
+        self._filter_entries["icp_score_min"] = e1
         ctk.CTkLabel(icpf, text="Max", font=(FONT_FAMILY, 10), text_color=TEXT_SECONDARY).grid(row=0, column=2, sticky="w", padx=(0, 2))
         self.icp_score_max_var = ctk.StringVar()
-        self.icp_score_max_var.trace_add("write", self._schedule_refilter)
         e2 = ctk.CTkEntry(icpf, textvariable=self.icp_score_max_var, placeholder_text="100",
                      fg_color=CARD_LIGHT, text_color=TEXT, font=(FONT_FAMILY, 11),
                      border_width=0, corner_radius=6, height=30,
                      )
         e2.grid(row=0, column=3, sticky="ew")
-        e2.bind("<KeyRelease>", self._schedule_refilter)
+        self._filter_entries["icp_score_max"] = e2
         r += 1
 
         self.lead_status_group = FilterDropdown(fc, "LEAD STATUS", LEAD_STATUS_OPTIONS, on_change=self._schedule_refilter)
@@ -494,22 +489,20 @@ class TerrascopeApp(ctk.CTk):
         lff.grid_columnconfigure((0, 1, 2), weight=1)
         ctk.CTkLabel(lff, text="From", font=(FONT_FAMILY, 10), text_color=TEXT_SECONDARY).grid(row=0, column=0, sticky="w", padx=(0, 2))
         self.fetch_from_var = ctk.StringVar()
-        self.fetch_from_var.trace_add("write", self._schedule_refilter)
         e1 = ctk.CTkEntry(lff, textvariable=self.fetch_from_var, placeholder_text="2026-01-01",
                      fg_color=CARD_LIGHT, text_color=TEXT, font=(FONT_FAMILY, 11),
                      border_width=0, corner_radius=6, height=30,
                      )
         e1.grid(row=0, column=1, sticky="ew", padx=(0, 4))
-        e1.bind("<KeyRelease>", self._schedule_refilter)
+        self._filter_entries["fetch_from"] = e1
         ctk.CTkLabel(lff, text="To", font=(FONT_FAMILY, 10), text_color=TEXT_SECONDARY).grid(row=0, column=2, sticky="w", padx=(0, 2))
         self.fetch_to_var = ctk.StringVar()
-        self.fetch_to_var.trace_add("write", self._schedule_refilter)
         e2 = ctk.CTkEntry(lff, textvariable=self.fetch_to_var, placeholder_text="2026-12-31",
                      fg_color=CARD_LIGHT, text_color=TEXT, font=(FONT_FAMILY, 11),
                      border_width=0, corner_radius=6, height=30,
                      )
         e2.grid(row=0, column=3, sticky="ew")
-        e2.bind("<KeyRelease>", self._schedule_refilter)
+        self._filter_entries["fetch_to"] = e2
         r += 1
 
         # Find button
@@ -1026,16 +1019,9 @@ class TerrascopeApp(ctk.CTk):
         if self.df is None:
             self.after(500, self._poll_filters)
             return
-        current = {
-            "emp_min": self.emp_min_var.get(),
-            "emp_max": self.emp_max_var.get(),
-            "target_year_min": self.target_year_min_var.get(),
-            "target_year_max": self.target_year_max_var.get(),
-            "icp_score_min": self.icp_score_min_var.get(),
-            "icp_score_max": self.icp_score_max_var.get(),
-            "fetch_from": self.fetch_from_var.get(),
-            "fetch_to": self.fetch_to_var.get(),
-        }
+        current = {}
+        for key, entry in self._filter_entries.items():
+            current[key] = entry.get()
         if current != self._last_filter_values:
             self._last_filter_values = current
             self._schedule_refilter()
@@ -1051,17 +1037,19 @@ class TerrascopeApp(ctk.CTk):
         self.exclude_group.set_all(False)
         self.region_group.set_all(False)
         self.regulatory_group.set_all(False)
+        for e in self._filter_entries.values():
+            e.delete(0, "end")
         self.emp_min_var.set("")
         self.emp_max_var.set("")
-        self.country_var.set("All")
-        self.commit_var.set("All")
         self.target_year_min_var.set("")
         self.target_year_max_var.set("")
         self.icp_score_min_var.set("")
         self.icp_score_max_var.set("")
-        self.lead_status_group.set_all(False)
         self.fetch_from_var.set("")
         self.fetch_to_var.set("")
+        self.country_var.set("All")
+        self.commit_var.set("All")
+        self.lead_status_group.set_all(False)
         self.search_var.set("")
         self._on_find_companies()
 
@@ -1074,6 +1062,10 @@ class TerrascopeApp(ctk.CTk):
             self._filter_pending = True
             return
 
+        def _entry_val(key):
+            e = self._filter_entries.get(key)
+            return e.get().strip() if e else ""
+
         def _int_or_none(v):
             try:
                 return int(v.strip())
@@ -1083,19 +1075,19 @@ class TerrascopeApp(ctk.CTk):
         filters = {
             "industries": tuple(sorted(self.industry_group.get_selected())),
             "excluded_industries": tuple(sorted(self.exclude_group.get_selected())),
-            "employees_min": _int_or_none(self.emp_min_var.get()),
-            "employees_max": _int_or_none(self.emp_max_var.get()),
+            "employees_min": _int_or_none(_entry_val("emp_min")),
+            "employees_max": _int_or_none(_entry_val("emp_max")),
             "regions": tuple(sorted(self.region_group.get_selected())),
             "regulatory": tuple(sorted(self.regulatory_group.get_selected())),
             "commitment": self.commit_var.get(),
             "countries": tuple([]) if self.country_var.get() == "All" else tuple([self.country_var.get()]),
-            "target_year_min": _int_or_none(self.target_year_min_var.get()),
-            "target_year_max": _int_or_none(self.target_year_max_var.get()),
-            "icp_score_min": _int_or_none(self.icp_score_min_var.get()),
-            "icp_score_max": _int_or_none(self.icp_score_max_var.get()),
+            "target_year_min": _int_or_none(_entry_val("target_year_min")),
+            "target_year_max": _int_or_none(_entry_val("target_year_max")),
+            "icp_score_min": _int_or_none(_entry_val("icp_score_min")),
+            "icp_score_max": _int_or_none(_entry_val("icp_score_max")),
             "lead_statuses": tuple(sorted(self.lead_status_group.get_selected())),
-            "fetch_from": self.fetch_from_var.get().strip(),
-            "fetch_to": self.fetch_to_var.get().strip(),
+            "fetch_from": _entry_val("fetch_from"),
+            "fetch_to": _entry_val("fetch_to"),
         }
 
         fhash = hash(tuple(sorted(filters.items())))
