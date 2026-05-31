@@ -439,6 +439,15 @@ def load_cached_data():
                 except:
                     return {}
             df["score_breakdown"] = df["score_breakdown"].apply(_parse)
+        today = datetime.now().strftime("%Y-%m-%d")
+        if "last_sbti_fetch" in df.columns and df["last_sbti_fetch"].isna().all():
+            df["last_sbti_fetch"] = today
+            out = df.copy()
+            if "score_breakdown" in out.columns:
+                out["score_breakdown"] = out["score_breakdown"].apply(
+                    lambda v: json.dumps(v) if isinstance(v, dict) else v
+                )
+            out.to_csv(CACHE_FILE, index=False, encoding="utf-8")
         return df
     return None
 
@@ -467,7 +476,7 @@ def merge_sbti_update(current_df, fresh_df):
     fresh = fresh_df.copy()
     today = datetime.now().strftime("%Y-%m-%d")
 
-    if "last_sbti_fetch" not in current.columns:
+    if "last_sbti_fetch" not in current.columns or current["last_sbti_fetch"].isna().all():
         current["last_sbti_fetch"] = today
 
     current["_key"] = current["company"].fillna("").str.lower().str.strip()

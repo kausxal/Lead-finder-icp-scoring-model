@@ -1032,6 +1032,9 @@ class TerrascopeApp(ctk.CTk):
             messagebox.showwarning("No Data", "Please download the SBTi database first.")
             return
 
+        if getattr(self, '_filter_running', False):
+            return
+
         def _int_or_none(v):
             try:
                 return int(v.strip())
@@ -1062,11 +1065,10 @@ class TerrascopeApp(ctk.CTk):
                 and self._last_filter_dfv == dv and self.filtered_df is not None):
             self.find_btn.configure(state="normal", text="\U0001f50d  Find Companies")
             return
-        self._last_filter_hash = fhash
-        self._last_filter_dfv = dv
 
         self.find_btn.configure(state="disabled", text="\u23f3  Searching...")
         self.status_bar.set_status("Computing scores...")
+        self._filter_running = True
 
         def run():
             try:
@@ -1083,11 +1085,15 @@ class TerrascopeApp(ctk.CTk):
                     if c != "All":
                         result = result[result["sbti_status"].str.lower().str.contains(c.lower(), na=False)]
 
+                self._last_filter_hash = fhash
+                self._last_filter_dfv = dv + 1
                 self.after(0, lambda d=df, r=result: self._on_scores_ready(d, r))
             except Exception as e:
                 self.after(0, lambda: self.status_bar.set_status("Computation failed"))
                 self.after(0, lambda: messagebox.showerror("Error", str(e)))
                 self.after(0, lambda: self.find_btn.configure(state="normal", text="\U0001f50d  Find Companies"))
+            finally:
+                self.after(0, lambda: setattr(self, '_filter_running', False))
         threading.Thread(target=run, daemon=True).start()
 
     def _on_scores_ready(self, df, result):
